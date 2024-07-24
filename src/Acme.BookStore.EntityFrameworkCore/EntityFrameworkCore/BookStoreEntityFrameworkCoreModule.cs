@@ -4,7 +4,7 @@ using Volo.Abp.Uow;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.SqlServer;
+using Volo.Abp.EntityFrameworkCore.MySQL;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Modularity;
@@ -21,7 +21,7 @@ namespace Acme.BookStore.EntityFrameworkCore;
     typeof(AbpOpenIddictEntityFrameworkCoreModule),
     typeof(AbpPermissionManagementEntityFrameworkCoreModule),
     typeof(AbpSettingManagementEntityFrameworkCoreModule),
-    typeof(AbpEntityFrameworkCoreSqlServerModule),
+    typeof(AbpEntityFrameworkCoreMySQLModule),
     typeof(AbpBackgroundJobsEntityFrameworkCoreModule),
     typeof(AbpAuditLoggingEntityFrameworkCoreModule),
     typeof(AbpTenantManagementEntityFrameworkCoreModule),
@@ -47,7 +47,7 @@ public class BookStoreEntityFrameworkCoreModule : AbpModule
         {
                 /* The main point to change your DBMS.
                  * See also BookStoreMigrationsDbContextFactory for EF Core tooling. */
-            options.UseSqlServer();
+            options.UseMySQL();
         });
 
     }
