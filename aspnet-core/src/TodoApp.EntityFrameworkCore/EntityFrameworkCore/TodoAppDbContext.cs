@@ -24,6 +24,7 @@ public class TodoAppDbContext :
     ITenantManagementDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
+    public DbSet<TodoItem> TodoItems { get; set; }
 
     #region Entities from the modules
 
@@ -75,6 +76,11 @@ public class TodoAppDbContext :
         builder.ConfigureTenantManagement();
 
         /* Configure your own tables/entities inside here */
+
+        builder.Entity<TodoItem>(b =>
+        {
+            b.ToTable(TodoAppConsts.DbTablePrefix + "TodoItems", TodoAppConsts.DbSchema);
+        });
 
         //builder.Entity<YourEntity>(b =>
         //{
