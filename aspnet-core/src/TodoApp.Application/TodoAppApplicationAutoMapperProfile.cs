@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Volo.Abp.Identity;
 
 namespace TodoApp;
 
@@ -10,5 +11,6 @@ public class TodoAppApplicationAutoMapperProfile : Profile
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
         CreateMap<TodoItem, TodoItemDto>();
+        CreateMap<IdentityUser, IdentityUserDto>();
     }
 }

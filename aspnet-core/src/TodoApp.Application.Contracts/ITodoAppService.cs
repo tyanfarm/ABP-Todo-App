@@ -11,6 +11,7 @@ namespace TodoApp
     {
         Task<List<TodoItemDto>> GetListAsync();
         Task<TodoItemDto> CreateAsync(string text);
+        Task<TodoItemDto> UpdateAsync(Guid id, string text);
         Task DeleteAsync(Guid id);
     }
 }

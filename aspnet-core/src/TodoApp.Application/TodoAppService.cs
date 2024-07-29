@@ -37,5 +37,19 @@ namespace TodoApp
 
             return ObjectMapper.Map<List<TodoItem>, List<TodoItemDto>>(items);
         }
+
+        public async Task<TodoItemDto> UpdateAsync(Guid id, string text)
+        {
+            var item = await _repository.SingleOrDefaultAsync(x => x.Id == id );
+
+            if (item == null) {
+                return null;
+            }
+
+            item.Text = text;
+            await _repository.UpdateAsync( item );
+
+            return ObjectMapper.Map<TodoItem, TodoItemDto>(item);
+        }
     }
 }
