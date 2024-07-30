@@ -33,7 +33,7 @@ namespace TodoApp
             await _repository.DeleteAsync( id );
         }
 
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
         public async Task<List<TodoItemDto>> GetListAsync()
         {
             var items = await _repository.GetListAsync();

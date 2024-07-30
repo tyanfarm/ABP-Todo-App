@@ -19,15 +19,17 @@ namespace TodoApp
     public class AuthAppService : ApplicationService, IAuthAppService
     {
         private readonly IConfiguration _configuration;
-        //private readonly IIdentityUserRepository _identityUserRepository;
         private readonly IdentityUserManager _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AuthAppService(
             IConfiguration configuration,
-            IdentityUserManager userManager)
+            IdentityUserManager userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _configuration = configuration;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<string> LoginAsync(UserLoginDto input)
@@ -69,6 +71,17 @@ namespace TodoApp
             {
                 throw new Exception(result.Errors.JoinAsString("\n"));
             }
+            //else
+            //{
+            //    var role = await _roleManager.RoleExistsAsync("Admin");
+
+            //    if (!role)
+            //    {
+            //        await _roleManager.CreateAsync(new IdentityRole(Guid.NewGuid(), "Admin"));
+            //    }
+
+            //    await _userManager.AddToRoleAsync(newUser, "Admin");
+            //}
 
             return ObjectMapper.Map<IdentityUser, IdentityUserDto>(newUser);
         }
@@ -88,6 +101,7 @@ namespace TodoApp
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
 
+                //new Claim(ClaimTypes.Role, "Admin"),
                 // JWT ID
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 
