@@ -3,6 +3,7 @@
 ## Nuget Packages
 - `Volo.Abp.EntityFrameworkCore.MySQL` - EntityFrameworkCore
 - `System.IdentityModel.Tokens.Jwt` - Application
+- `Microsoft.AspNetCore.Authentication.JwtBearer` - HttpApi.Host
 
 ## About this solution
 
