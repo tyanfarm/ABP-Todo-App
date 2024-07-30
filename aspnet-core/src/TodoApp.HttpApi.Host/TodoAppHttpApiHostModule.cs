@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,6 +29,9 @@ using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace TodoApp;
 
@@ -63,7 +66,7 @@ public class TodoAppHttpApiHostModule : AbpModule
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
-        ConfigureAuthentication(context);
+        ConfigureAuthentication(context, configuration);
         ConfigureBundles();
         ConfigureUrls(configuration);
         ConfigureConventionalControllers();
@@ -72,13 +75,41 @@ public class TodoAppHttpApiHostModule : AbpModule
         ConfigureSwaggerServices(context, configuration);
     }
 
-    private void ConfigureAuthentication(ServiceConfigurationContext context)
+    private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
     {
         context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
         context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
         {
             options.IsDynamicClaimsEnabled = true;
         });
+
+        // -- JWT Authentication Service --
+        context.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+            .AddJwtBearer(jwt =>
+            {
+                jwt.SaveToken = true;
+
+                jwt.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetSection("JwtConfig:Secret").Value)),
+                    ValidateIssuer = false,     // for dev
+                    ValidateAudience = false,   // for dev
+
+                    ClockSkew = TimeSpan.Zero,
+
+                    // Kiểm tra token có ngày hết hạn không
+                    RequireExpirationTime = true,      // for dev - need to update when refresh token is added
+
+                    // Kiểm tra token còn sống không
+                    ValidateLifetime = true
+                };
+            });
     }
 
     private void ConfigureBundles()
@@ -152,31 +183,39 @@ public class TodoAppHttpApiHostModule : AbpModule
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApp API", Version = "v1" });
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
+            });
 
-                // -- Authorization JWT Services --
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                { 
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        // -- Configure Swagger for JWT Authorization --
+        context.Services.AddSwaggerGen(options => {
+            options.AddSecurityDefinition(name: JwtBearerDefaults.AuthenticationScheme,
+                securityScheme: new OpenApiSecurityScheme
+                {
+                    // Tên của header HTTP mà token sẽ được gửi trong đó.
                     Name = "Authorization",
+                    Description = "Enter the Bearer Authorization : `Bearer Generated-JWT-Token`",
+
+                    // Chỉ định rằng token sẽ được gửi trong phần header của yêu cầu HTTP.
                     In = ParameterLocation.Header,
+
+                    // Chỉ định loại bảo mật là API key (JWT token hoạt động như một API key).
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer"
                 });
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                }); 
+                    new OpenApiSecurityScheme {
+                        Reference = new OpenApiReference {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = JwtBearerDefaults.AuthenticationScheme
+                        }
+                    },
+                    new string[] {}
+                }
             });
+        });
+
     }
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
@@ -239,7 +278,6 @@ public class TodoAppHttpApiHostModule : AbpModule
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
             c.OAuthScopes("TodoApp");
-            c.OAuthUsePkce();
         });
 
         app.UseAuditing();

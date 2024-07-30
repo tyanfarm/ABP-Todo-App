@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using TodoApp.Dtos;
@@ -23,17 +24,14 @@ namespace TodoApp
 
         public AuthAppService(
             IConfiguration configuration,
-            //IIdentityUserAppService identityUserRepository,
             IdentityUserManager userManager)
         {
             _configuration = configuration;
-            //_identityUserRepository = identityUserRepository;
             _userManager = userManager;
         }
 
         public async Task<string> LoginAsync(UserLoginDto input)
         {
-            //var user = await _identityUserRepository.FindByLoginAsync(email, password);
             var user = await _userManager.FindByEmailAsync(input.Email);
 
             if (user == null) 
@@ -77,6 +75,8 @@ namespace TodoApp
 
         private string GenerateJwtToken(IdentityUser user)
         {
+            var jwtTokenHanlder = new JwtSecurityTokenHandler();
+
             // SymmetricSecurityKey - khóa đối xứng
             // mã hóa bằng thuật toán HMAC-SHA256
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JwtConfig:Secret").Value));
@@ -96,19 +96,18 @@ namespace TodoApp
 
             };
 
-            var tokenDescriptor = new JwtSecurityToken
-            (
-                // Claims
-                claims: claims,
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
 
-                expires: DateTime.UtcNow
-                .Add(TimeSpan
-                .Parse(_configuration.GetSection("JwtConfig:ExpiryTimeFrame").Value)),
+                Expires = DateTime.UtcNow.Add(TimeSpan.Parse(_configuration.GetSection("JwtConfig:ExpiryTimeFrame").Value)),
 
-                signingCredentials: credentials
-            );
+                SigningCredentials = credentials
+            };
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+            var token = jwtTokenHanlder.CreateToken(tokenDescriptor);
+            var jwtToken = jwtTokenHanlder.WriteToken(token);
+            return jwtToken;
         }
     }
 }

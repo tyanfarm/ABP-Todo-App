@@ -33,11 +33,6 @@ public class Program
                 .UseAutofac()
                 .UseSerilog();
 
-            // -- Authentication with JWT --
-            // Add services to the container
-            builder.Services.AddControllers();
-
-
             await builder.AddApplicationAsync<TodoAppHttpApiHostModule>();
             var app = builder.Build();
             await app.InitializeApplicationAsync();

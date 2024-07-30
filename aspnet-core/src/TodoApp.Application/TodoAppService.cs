@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace TodoApp
             _repository = repository;
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<TodoItemDto> CreateAsync(string text)
         {
             var item = await _repository.InsertAsync(
@@ -31,6 +33,7 @@ namespace TodoApp
             await _repository.DeleteAsync( id );
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<List<TodoItemDto>> GetListAsync()
         {
             var items = await _repository.GetListAsync();
