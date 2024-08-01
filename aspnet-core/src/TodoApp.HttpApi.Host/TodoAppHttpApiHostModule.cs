@@ -32,6 +32,7 @@ using Volo.Abp.VirtualFileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TodoApp.Permissions;
 
 namespace TodoApp;
 
@@ -73,6 +74,15 @@ public class TodoAppHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
+
+        context.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy(TodoAppPermissions.Todo.Default, policy =>
+            {
+                policy.RequireClaim("Permission", TodoAppPermissions.Todo.Default);
+            });
+        });
+
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)

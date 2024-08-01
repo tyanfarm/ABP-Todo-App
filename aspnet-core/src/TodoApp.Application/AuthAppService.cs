@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using TodoApp.Dtos;
+using TodoApp.Permissions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Identity;
 using Volo.Abp.Users;
@@ -71,6 +72,7 @@ namespace TodoApp
             {
                 throw new Exception(result.Errors.JoinAsString("\n"));
             }
+            // ---- Role-Based Authorization ----
             //else
             //{
             //    var role = await _roleManager.RoleExistsAsync("Admin");
@@ -101,6 +103,7 @@ namespace TodoApp
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
 
+                new Claim("Permission", TodoAppPermissions.Todo.Default),
                 //new Claim(ClaimTypes.Role, "Admin"),
                 // JWT ID
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

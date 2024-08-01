@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TodoApp.Permissions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
@@ -33,7 +34,8 @@ namespace TodoApp
             await _repository.DeleteAsync( id );
         }
 
-        //[Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+        //[Authorize(AuthenticationSchemes = "Bearer", Policy ="")]
+        [Authorize(TodoAppPermissions.Todo.Default)]
         public async Task<List<TodoItemDto>> GetListAsync()
         {
             var items = await _repository.GetListAsync();
