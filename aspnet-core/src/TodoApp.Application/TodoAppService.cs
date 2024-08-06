@@ -35,7 +35,7 @@ namespace TodoApp
         }
 
         //[Authorize(AuthenticationSchemes = "Bearer", Policy ="")]
-        [Authorize(TodoAppPermissions.Todo.Default)]
+        //[Authorize(TodoAppPermissions.Todo.Default)]
         public async Task<List<TodoItemDto>> GetListAsync()
         {
             var items = await _repository.GetListAsync();

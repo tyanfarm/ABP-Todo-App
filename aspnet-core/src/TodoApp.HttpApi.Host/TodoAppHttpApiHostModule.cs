@@ -33,6 +33,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TodoApp.Permissions;
+using TodoApp.EventBus;
+using Microsoft.Extensions.Logging;
 
 namespace TodoApp;
 
@@ -83,6 +85,7 @@ public class TodoAppHttpApiHostModule : AbpModule
             });
         });
 
+        context.Services.AddTransient<HandleEventService>();
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)

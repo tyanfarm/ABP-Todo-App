@@ -1,5 +1,8 @@
 # TodoApp
 
+# Domain Driven Design (DDD)
+- ![alt](./pictures/DDD.png)
+
 ## Nuget Packages
 - `Volo.Abp.EntityFrameworkCore.MySQL` - EntityFrameworkCore
 - `System.IdentityModel.Tokens.Jwt` - Application

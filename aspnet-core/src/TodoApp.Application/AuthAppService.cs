@@ -67,7 +67,7 @@ namespace TodoApp
             };
 
             var result = await _userManager.CreateAsync(newUser, input.Password);
-            
+
             if (result.Succeeded == false)
             {
                 throw new Exception(result.Errors.JoinAsString("\n"));
