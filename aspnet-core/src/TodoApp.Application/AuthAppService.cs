@@ -123,6 +123,7 @@ namespace TodoApp
             };
 
             var token = jwtTokenHanlder.CreateToken(tokenDescriptor);
+
             var jwtToken = jwtTokenHanlder.WriteToken(token);
             return jwtToken;
         }

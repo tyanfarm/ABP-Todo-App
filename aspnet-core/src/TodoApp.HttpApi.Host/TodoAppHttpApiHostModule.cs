@@ -35,6 +35,9 @@ using System.Text;
 using TodoApp.Permissions;
 using TodoApp.EventBus;
 using Microsoft.Extensions.Logging;
+using TodoApp.Dtos;
+using Abp.Net.Mail;
+using TodoApp.Services;
 
 namespace TodoApp;
 
@@ -85,7 +88,15 @@ public class TodoAppHttpApiHostModule : AbpModule
             });
         });
 
-        context.Services.AddTransient<HandleEventService>();
+        // Add EmailSender Info
+        context.Services.Configure<EmailInfoDto>(configuration.GetSection("EmailInfo"));
+
+        // Khi đăng ký 1 Service ở đây, cần implement IScopedDependency / ITransientDependency 
+        // Add EventBus Publisher
+        context.Services.AddTransient<UserEventService>();
+
+        // EmailSender Service
+        context.Services.AddScoped<IEmailSenderService, EmailSenderService>();
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
