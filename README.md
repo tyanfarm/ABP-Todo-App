@@ -7,6 +7,7 @@
 - `Volo.Abp.EntityFrameworkCore.MySQL` - EntityFrameworkCore
 - `System.IdentityModel.Tokens.Jwt` - Application
 - `Microsoft.AspNetCore.Authentication.JwtBearer` - HttpApi.Host
+- `Microsoft.AspNet.Identity.EntityFramework` 
 
 ## About this solution
 
