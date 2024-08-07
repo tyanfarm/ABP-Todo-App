@@ -9,7 +9,12 @@ namespace TodoApp
 {
     public class LogUser : Entity<Guid>
     {
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
         public DateTime ExecutionTime { get; set; }
+
+        public LogUser() 
+        {
+            ExecutionTime = DateTime.Now;
+        }
     }
 }
