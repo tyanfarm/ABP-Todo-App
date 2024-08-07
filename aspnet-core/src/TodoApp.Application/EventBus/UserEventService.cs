@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TodoApp.Dtos;
+using TodoApp.Dtos.Events;
 using TodoApp.Services;
 using Volo.Abp.Domain.Entities.Events;
 using Volo.Abp.EventBus;
@@ -14,6 +15,7 @@ namespace TodoApp.EventBus
 {
     public class UserEventService
         : ILocalEventHandler<EntityCreatedEventData<IdentityUser>>,         // Publisher
+        ILocalEventHandler<UserLoginEvent>,
         ITransientDependency
     {
         private readonly IEmailSenderService _emailSender;
@@ -107,6 +109,14 @@ namespace TodoApp.EventBus
             {
                 System.Diagnostics.Debug.WriteLine(e.ToString());
             }
+        }
+
+        // Subcriber - Log khi user login
+        public async Task HandleEventAsync(UserLoginEvent eventData)
+        {
+            var userId = eventData.UserId;
+
+            System.Diagnostics.Debug.Print(userId.ToString());
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -25,6 +26,7 @@ public class TodoAppDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
     public DbSet<TodoItem> TodoItems { get; set; }
+    public DbSet<LogUser> LogUsers { get; set; }
 
     #region Entities from the modules
 
@@ -76,10 +78,18 @@ public class TodoAppDbContext :
         builder.ConfigureTenantManagement();
 
         /* Configure your own tables/entities inside here */
+        // Add Table in DB by opening a cmd terminal in `TodoApp.EntityFrameworkCore`
+        // dotnet ef migrations add Migration_Name
+        // dotnet ef database update
 
         builder.Entity<TodoItem>(b =>
         {
             b.ToTable(TodoAppConsts.DbTablePrefix + "TodoItems", TodoAppConsts.DbSchema);
+        });
+
+        builder.Entity<LogUser>(b =>
+        {
+            b.ToTable(TodoAppConsts.DbTablePrefix + "LogUsers", TodoAppConsts.DbSchema);
         });
 
         //builder.Entity<YourEntity>(b =>

@@ -10,8 +10,10 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using TodoApp.Dtos;
+using TodoApp.Dtos.Events;
 using TodoApp.Permissions;
 using Volo.Abp.Application.Services;
+using Volo.Abp.EventBus.Local;
 using Volo.Abp.Identity;
 using Volo.Abp.Users;
 
@@ -22,15 +24,18 @@ namespace TodoApp
         private readonly IConfiguration _configuration;
         private readonly IdentityUserManager _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILocalEventBus _localEventBus;
 
         public AuthAppService(
             IConfiguration configuration,
             IdentityUserManager userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            ILocalEventBus localEventBus)
         {
             _configuration = configuration;
             _userManager = userManager;
             _roleManager = roleManager;
+            _localEventBus = localEventBus;
         }
 
         public async Task<string> LoginAsync(UserLoginDto input)
@@ -48,6 +53,14 @@ namespace TodoApp
             {
                 throw new Exception("Invalid credentials");
             }
+
+            // PUBLISH EVENT
+            await _localEventBus.PublishAsync(
+                new UserLoginEvent
+                {
+                    UserId = user.Id
+                }
+            );
 
             return GenerateJwtToken(user);
         }
