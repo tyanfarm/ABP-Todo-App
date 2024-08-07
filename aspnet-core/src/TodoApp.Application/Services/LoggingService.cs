@@ -11,16 +11,18 @@ namespace TodoApp.Services
     public class LoggingService : ILoggingService
     {
         // 
-        private readonly IRepository<LogUser, Guid> _repository;
+        private readonly IRepository<LogUser, Guid> _logRepository;
 
-        public LoggingService(IRepository<LogUser, Guid> repository)
+        public LoggingService(IRepository<LogUser, Guid> logRepository)
         {
-            _repository = repository;
+            _logRepository = logRepository;
         }
 
-        public Task Log(string userId)
+        public async Task Log(string userId)
         {
-            throw new NotImplementedException();
+            var logUser = new LogUser { UserId = userId };
+
+            await _logRepository.InsertAsync(logUser);
         }
     }
 }

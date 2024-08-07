@@ -19,10 +19,12 @@ namespace TodoApp.EventBus
         ITransientDependency
     {
         private readonly IEmailSenderService _emailSender;
+        private readonly ILoggingService _loggingService;
 
-        public UserEventService(IEmailSenderService emailSender)
+        public UserEventService(IEmailSenderService emailSender, ILoggingService loggingService)
         {
             _emailSender = emailSender;
+            _loggingService = loggingService;
         }
 
         // Mỗi HandleEvent sẽ tương ứng với TEvent được đăng ký ở ILocalEventHandler phía trên
@@ -114,9 +116,9 @@ namespace TodoApp.EventBus
         // Subcriber - Log khi user login
         public async Task HandleEventAsync(UserLoginEvent eventData)
         {
-            var userId = eventData.UserId;
+            var userId = eventData.UserId.ToString();
 
-            System.Diagnostics.Debug.Print(userId.ToString());
+            await _loggingService.Log(userId);
         }
     }
 }
