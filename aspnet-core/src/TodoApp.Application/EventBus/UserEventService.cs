@@ -19,9 +19,9 @@ namespace TodoApp.EventBus
         ITransientDependency
     {
         private readonly IEmailSenderService _emailSender;
-        private readonly ILoggingService _loggingService;
+        private readonly IEnumerable<ILoggingService> _loggingService;
 
-        public UserEventService(IEmailSenderService emailSender, ILoggingService loggingService)
+        public UserEventService(IEmailSenderService emailSender, IEnumerable<ILoggingService> loggingService)
         {
             _emailSender = emailSender;
             _loggingService = loggingService;
@@ -119,7 +119,10 @@ namespace TodoApp.EventBus
             var userId = eventData.UserId.ToString();
             var serviceName = eventData.ServiceName;
 
-            await _loggingService.Log(userId, serviceName);
+            foreach (var service in _loggingService)
+            {
+                await service.Log(userId, serviceName);
+            }
         }
     }
 }
