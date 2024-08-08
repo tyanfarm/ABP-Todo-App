@@ -98,7 +98,8 @@ public class TodoAppHttpApiHostModule : AbpModule
         // EmailSender Service
         context.Services.AddScoped<IEmailSenderService, EmailSenderService>();
         // Logging Service
-        context.Services.AddScoped<ILoggingService, LoggingService>();
+        context.Services.AddScoped<ILoggingService, FileLoggingService>();
+        context.Services.AddScoped<ILoggingService, DatabaseLoggingService>();
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)

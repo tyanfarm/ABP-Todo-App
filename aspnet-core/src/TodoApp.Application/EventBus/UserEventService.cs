@@ -113,12 +113,13 @@ namespace TodoApp.EventBus
             }
         }
 
-        // Subcriber - Log khi user login
+        // Subcriber - Log các service của User Authentication
         public async Task HandleEventAsync(UserLoginEvent eventData)
         {
             var userId = eventData.UserId.ToString();
+            var serviceName = eventData.ServiceName;
 
-            await _loggingService.Log(userId);
+            await _loggingService.Log(userId, serviceName);
         }
     }
 }

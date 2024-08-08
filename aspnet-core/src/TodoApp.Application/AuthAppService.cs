@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿    using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -16,6 +16,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Identity;
 using Volo.Abp.Users;
+using static Volo.Abp.Identity.Settings.IdentitySettingNames;
 
 namespace TodoApp
 {
@@ -58,7 +59,8 @@ namespace TodoApp
             await _localEventBus.PublishAsync(
                 new UserLoginEvent
                 {
-                    UserId = user.Id
+                    UserId = user.Id,
+                    ServiceName = "UserLogin"
                 }
             );
 
@@ -97,6 +99,15 @@ namespace TodoApp
 
             //    await _userManager.AddToRoleAsync(newUser, "Admin");
             //}
+
+            // PUBLISH EVENT
+            await _localEventBus.PublishAsync(
+                new UserLoginEvent
+                {
+                    UserId = newUser.Id,
+                    ServiceName = "UserRegister"
+                }
+            );
 
             return ObjectMapper.Map<IdentityUser, IdentityUserDto>(newUser);
         }

@@ -9,6 +9,6 @@ namespace TodoApp.Services
 {
     public interface ILoggingService 
     {
-        Task Log(string userId);
+        Task Log(string userId, string serviceName);
     }
 }

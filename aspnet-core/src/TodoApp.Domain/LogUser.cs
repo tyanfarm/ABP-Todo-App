@@ -10,10 +10,12 @@ namespace TodoApp
     public class LogUser : Entity<Guid>
     {
         public string UserId { get; set; }
+        public string ServiceName { get; set; }
         public DateTime ExecutionTime { get; set; }
 
         public LogUser() 
         {
+            Id = Guid.NewGuid();
             ExecutionTime = DateTime.Now;
         }
     }

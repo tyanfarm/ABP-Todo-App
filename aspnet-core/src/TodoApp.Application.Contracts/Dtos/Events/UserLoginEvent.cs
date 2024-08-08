@@ -9,5 +9,6 @@ namespace TodoApp.Dtos.Events
     public class UserLoginEvent
     {
         public Guid UserId { get; set; } 
+        public string ServiceName { get; set; }
     }
 }

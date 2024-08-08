@@ -8,19 +8,18 @@ using Volo.Abp.Domain.Repositories;     // Nếu `Abp.Domain.Repositories` sẽ 
 
 namespace TodoApp.Services
 {
-    public class LoggingService : ILoggingService
+    public class DatabaseLoggingService : ILoggingService
     {
-        // 
         private readonly IRepository<LogUser, Guid> _logRepository;
 
-        public LoggingService(IRepository<LogUser, Guid> logRepository)
+        public DatabaseLoggingService(IRepository<LogUser, Guid> logRepository)
         {
             _logRepository = logRepository;
         }
 
-        public async Task Log(string userId)
+        public async Task Log(string userId, string serviceName)
         {
-            var logUser = new LogUser { UserId = userId };
+            var logUser = new LogUser { UserId = userId, ServiceName = serviceName };
 
             await _logRepository.InsertAsync(logUser);
         }
