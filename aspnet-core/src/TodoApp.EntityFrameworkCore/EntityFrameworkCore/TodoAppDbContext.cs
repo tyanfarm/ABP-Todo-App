@@ -26,6 +26,8 @@ public class TodoAppDbContext :
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
     public DbSet<TodoItem> TodoItems { get; set; }
     public DbSet<LogUser> LogUsers { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Order> Orders { get; set; }
 
     #region Entities from the modules
 
@@ -89,6 +91,23 @@ public class TodoAppDbContext :
         builder.Entity<LogUser>(b =>
         {
             b.ToTable(TodoAppConsts.DbTablePrefix + "LogUsers", TodoAppConsts.DbSchema);
+        });
+
+        builder.Entity<Product>(b =>
+        {
+            b.ToTable("Products", TodoAppConsts.DbSchema);
+        });
+
+        builder.Entity<Order>(b =>
+        {
+            b.ToTable("Orders", TodoAppConsts.DbSchema);
+
+            // Trong 1-n, phía 1 là Principal, phía n là Dependent
+            // Phía nhiều là phía phụ thuộc
+            // 1 Product - nhiều Order => Biến Product đặt trong Order
+            b.HasOne(d => d.Product).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("ProductID");
         });
 
         //builder.Entity<YourEntity>(b =>

@@ -12,6 +12,7 @@ namespace TodoApp
         public Guid ProductId { get; set; }
         public Guid CustomerId { get; set; }
         public DateTime OrderDate { get; set; }
+        public virtual Product? Product { get; set; }
         public Order()
         {
             OrderDate = DateTime.Now;
