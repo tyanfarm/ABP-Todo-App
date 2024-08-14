@@ -13,5 +13,9 @@ public class TodoAppApplicationAutoMapperProfile : Profile
          * into multiple profile classes for a better organization. */
         CreateMap<TodoItem, TodoItemDto>();
         CreateMap<IdentityUser, IdentityUserDto>();
+        CreateMap<Order, OrderDto>();
+        CreateMap<OrderDto, Order>();
+        CreateMap<Product, ProductDto>();
+        CreateMap<ProductDto, Product>();
     }
 }
