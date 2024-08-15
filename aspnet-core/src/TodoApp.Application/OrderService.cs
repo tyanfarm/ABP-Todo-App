@@ -1,26 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TodoApp.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Uow;
 
 namespace TodoApp
 {
     public class OrderService : ApplicationService, IOrderService
     {
         private readonly IRepository<Order, Guid> _orderRepository;
-        private readonly IRepository<Product, Guid> _productRespository; 
+        private readonly IRepository<Product, Guid> _productRespository;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public OrderService(
             IRepository<Order, Guid> orderRepository, 
-            IRepository<Product, Guid> productRespository
+            IRepository<Product, Guid> productRespository,
+            IUnitOfWorkManager unitOfWorkManager
         )
         {
             _orderRepository = orderRepository;
             _productRespository = productRespository;
+            _unitOfWorkManager = unitOfWorkManager;
         }
 
         public async Task<OrderDto> CreateAsync(OrderDto data)
@@ -47,30 +49,47 @@ namespace TodoApp
 
         public async Task<OrderDto> PlaceOrderAsync(Guid productId, int quantity)
         {
-            var product = await _productRespository.GetAsync(productId);
+           using (var uow = _unitOfWorkManager.Begin(
+               requiresNew: true, isTransactional: true
+           ))
+           {
+                try
+                {
+                    var product = await _productRespository.GetAsync(productId);
 
-            if (product == null)
-            {
-                throw new Exception("Product not found.");
-            }
+                    if (product == null)
+                    {
+                        throw new Exception("Product not found.");
+                    }
 
-            if (product.Quantity < quantity)
-            {
-                throw new Exception("Not enought stock available.");
-            }
+                    if (product.Quantity < quantity)
+                    {
+                        throw new Exception("Not enought stock available.");
+                    }
 
-            var order = new Order
-            {
-                ProductId = productId,
-                OrderDate = DateTime.Now,
-                Quantity = quantity
-            };
+                    await Task.Delay(3000);
 
-            product.Quantity -= quantity;
-            
-            await _orderRepository.InsertAsync(order);
+                    var order = new Order
+                    {
+                        ProductId = productId,
+                        OrderDate = DateTime.Now,
+                        Quantity = quantity
+                    };
 
-            return ObjectMapper.Map<Order, OrderDto>(order);
+                    product.Quantity -= quantity;
+
+                    // ABP có Change Tracking nên không cần Update _productRepository
+                    await _orderRepository.InsertAsync(order);
+
+                    await uow.CompleteAsync();
+
+                    return ObjectMapper.Map<Order, OrderDto>(order);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"{ex.Message}", ex);
+                }
+           }
         }
     }
 }
