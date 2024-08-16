@@ -15,7 +15,7 @@ namespace TodoApp.EventBus
 {
     public class UserEventService
         : ILocalEventHandler<EntityCreatedEventData<IdentityUser>>,         // Publisher
-        ILocalEventHandler<UserLoginEvent>,
+        ILocalEventHandler<UserEvent>,
         ITransientDependency
     {
         private readonly IEmailSenderService _emailSender;
@@ -114,7 +114,7 @@ namespace TodoApp.EventBus
         }
 
         // Subcriber - Log các service của User Authentication
-        public async Task HandleEventAsync(UserLoginEvent eventData)
+        public async Task HandleEventAsync(UserEvent eventData)
         {
             var userId = eventData.UserId.ToString();
             var serviceName = eventData.ServiceName;

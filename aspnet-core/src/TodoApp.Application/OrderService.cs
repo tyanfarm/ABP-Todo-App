@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TodoApp.Dtos;
+using TodoApp.EntityFrameworkCore;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
@@ -13,16 +15,19 @@ namespace TodoApp
         private readonly IRepository<Order, Guid> _orderRepository;
         private readonly IRepository<Product, Guid> _productRespository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
+        private readonly TodoAppDbContext _context;
 
         public OrderService(
-            IRepository<Order, Guid> orderRepository, 
+            IRepository<Order, Guid> orderRepository,
             IRepository<Product, Guid> productRespository,
-            IUnitOfWorkManager unitOfWorkManager
+            IUnitOfWorkManager unitOfWorkManager,
+            TodoAppDbContext context
         )
         {
             _orderRepository = orderRepository;
             _productRespository = productRespository;
             _unitOfWorkManager = unitOfWorkManager;
+            _context = context;
         }
 
         public async Task<OrderDto> CreateAsync(OrderDto data)
@@ -49,47 +54,44 @@ namespace TodoApp
 
         public async Task<OrderDto> PlaceOrderAsync(Guid productId, int quantity)
         {
-           using (var uow = _unitOfWorkManager.Begin(
-               requiresNew: true, isTransactional: true
-           ))
-           {
-                try
+            using (var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable))
+            {
+                var product = await _context.Products.
+                        FromSqlRaw("SELECT * FROM Products WHERE Id = {0} FOR UPDATE", productId)
+                        .FirstOrDefaultAsync();
+
+                if (product == null)
                 {
-                    var product = await _productRespository.GetAsync(productId);
-
-                    if (product == null)
-                    {
-                        throw new Exception("Product not found.");
-                    }
-
-                    if (product.Quantity < quantity)
-                    {
-                        throw new Exception("Not enought stock available.");
-                    }
-
-                    await Task.Delay(3000);
-
-                    var order = new Order
-                    {
-                        ProductId = productId,
-                        OrderDate = DateTime.Now,
-                        Quantity = quantity
-                    };
-
-                    product.Quantity -= quantity;
-
-                    // ABP có Change Tracking nên không cần Update _productRepository
-                    await _orderRepository.InsertAsync(order);
-
-                    await uow.CompleteAsync();
-
-                    return ObjectMapper.Map<Order, OrderDto>(order);
+                    throw new Exception("Product not found.");
                 }
-                catch (Exception ex)
+
+                if (product.Quantity < quantity)
                 {
-                    throw new Exception($"{ex.Message}", ex);
+                    throw new Exception("Not enought stock available.");
                 }
-           }
+
+                // Concurrency (Tính đồng thời) Test
+                await Task.Delay(3000);
+
+                var order = new Order
+                {
+                    ProductId = productId,
+                    OrderDate = DateTime.Now,
+                    Quantity = quantity
+                };
+
+                // Vì sử dụng SqlRaw để Pessimistic Lock nên update bằng dbContext
+                // Update bằng productRepository sẽ không thành công
+                product.Quantity -= quantity;
+                _context.Products.Update(product);
+                await _context.SaveChangesAsync();
+
+                await _orderRepository.InsertAsync(order);
+
+                await transaction.CommitAsync();
+
+                return ObjectMapper.Map<Order, OrderDto>(order);
+            }
         }
     }
 }

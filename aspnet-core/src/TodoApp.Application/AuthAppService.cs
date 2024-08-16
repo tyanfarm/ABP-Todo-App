@@ -1,5 +1,4 @@
-﻿    using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -24,18 +23,21 @@ namespace TodoApp
     {
         private readonly IConfiguration _configuration;
         private readonly IdentityUserManager _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IdentityRoleManager _roleManager;
+        //private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILocalEventBus _localEventBus;
 
         public AuthAppService(
             IConfiguration configuration,
             IdentityUserManager userManager,
-            RoleManager<IdentityRole> roleManager,
+            IdentityRoleManager roleManager,
+            //RoleManager<IdentityRole> roleManager,
             ILocalEventBus localEventBus)
         {
             _configuration = configuration;
             _userManager = userManager;
             _roleManager = roleManager;
+            //_roleManager = roleManager;
             _localEventBus = localEventBus;
         }
 
@@ -57,7 +59,7 @@ namespace TodoApp
 
             // PUBLISH EVENT
             await _localEventBus.PublishAsync(
-                new UserLoginEvent
+                new UserEvent
                 {
                     UserId = user.Id,
                     ServiceName = "UserLogin"
@@ -90,19 +92,20 @@ namespace TodoApp
             // ---- Role-Based Authorization ----
             //else
             //{
-            //    var role = await _roleManager.RoleExistsAsync("Admin");
+            //    var role = await _roleManager.RoleExistsAsync("Client");
 
             //    if (!role)
             //    {
-            //        await _roleManager.CreateAsync(new IdentityRole(Guid.NewGuid(), "Admin"));
+            //        await _roleManager.CreateAsync(new IdentityRole(Guid.NewGuid(), "Client"));
             //    }
 
-            //    await _userManager.AddToRoleAsync(newUser, "Admin");
+            //    await _userManager.AddToRoleAsync(newUser, "Client");
             //}
+            
 
             // PUBLISH EVENT
             await _localEventBus.PublishAsync(
-                new UserLoginEvent
+                new UserEvent
                 {
                     UserId = newUser.Id,
                     ServiceName = "UserRegister"

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TodoApp.Dtos.Events
 {
-    public class UserLoginEvent
+    public class UserEvent
     {
         public Guid UserId { get; set; } 
         public string ServiceName { get; set; }
