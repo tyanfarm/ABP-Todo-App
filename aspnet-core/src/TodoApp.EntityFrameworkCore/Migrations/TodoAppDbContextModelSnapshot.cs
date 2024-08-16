@@ -839,6 +839,9 @@ namespace TodoApp.Migrations
                         .HasDefaultValue(0)
                         .HasColumnName("AccessFailedCount");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .IsRequired()

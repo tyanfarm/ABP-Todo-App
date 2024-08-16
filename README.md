@@ -1,5 +1,12 @@
 # TodoApp
 
+# Add Custom Properties to User Entity
+- Create `UserConsts` in `CustomizeUserDemo.Domain.Shared` project
+- Update `CustomizeUserDemoEfCoreEntityExtensionMappings` class in `CustomizeUserDemo.EntityFramework`
+
+# Pessimistic Locking
+- Use `Isolation Level` - Serializable
+
 # Domain Driven Design (DDD)
 - ![alt](./pictures/DDD.png)
 

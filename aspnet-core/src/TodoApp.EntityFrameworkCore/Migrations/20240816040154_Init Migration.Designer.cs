@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace TodoApp.Migrations
 {
     [DbContext(typeof(TodoAppDbContext))]
-    [Migration("20240814075347_Update_Field_Orders_Table")]
-    partial class Update_Field_Orders_Table
+    [Migration("20240816040154_Init Migration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -841,6 +841,9 @@ namespace TodoApp.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0)
                         .HasColumnName("AccessFailedCount");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

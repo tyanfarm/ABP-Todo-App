@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TodoApp.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -519,6 +519,8 @@ namespace TodoApp.Migrations
                     ShouldChangePasswordOnNextLogin = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     EntityVersion = table.Column<int>(type: "int", nullable: false),
                     LastPasswordChangeTime = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
+                    Address = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ExtraProperties = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ConcurrencyStamp = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: false)
@@ -534,6 +536,37 @@ namespace TodoApp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AbpUsers", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AppLogUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ServiceName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ExecutionTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppLogUsers", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AppTodoItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Text = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppTodoItems", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -626,6 +659,22 @@ namespace TodoApp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OpenIddictScopes", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Price = table.Column<double>(type: "double", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -927,6 +976,28 @@ namespace TodoApp.Migrations
                         column: x => x.ApplicationId,
                         principalTable: "OpenIddictApplications",
                         principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ProductId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CustomerId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    OrderDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "ProductID",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -1251,6 +1322,11 @@ namespace TodoApp.Migrations
                 name: "IX_OpenIddictTokens_ReferenceId",
                 table: "OpenIddictTokens",
                 column: "ReferenceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_ProductId",
+                table: "Orders",
+                column: "ProductId");
         }
 
         /// <inheritdoc />
@@ -1329,10 +1405,19 @@ namespace TodoApp.Migrations
                 name: "AbpUserTokens");
 
             migrationBuilder.DropTable(
+                name: "AppLogUsers");
+
+            migrationBuilder.DropTable(
+                name: "AppTodoItems");
+
+            migrationBuilder.DropTable(
                 name: "OpenIddictScopes");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictTokens");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "AbpEntityChanges");
@@ -1351,6 +1436,9 @@ namespace TodoApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "OpenIddictAuthorizations");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "AbpAuditLogs");
