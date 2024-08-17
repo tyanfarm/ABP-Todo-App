@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -108,6 +109,13 @@ public class TodoAppDbContext :
             b.HasOne(d => d.Product).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ProductId)
                 .HasConstraintName("ProductID");
+
+            b.HasOne(d => d.Customer).WithMany()
+                .HasForeignKey(d => d.CustomerId)
+                .HasConstraintName("CustomerID")
+                // Nếu không có OnDelete này thì Update FK_IdentityUser_Order sẽ lỗi
+                .OnDelete(DeleteBehavior.Restrict);     
+
         });
 
         //builder.Entity<YourEntity>(b =>

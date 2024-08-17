@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TodoApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigration : Migration
+    public partial class AddedFK_IdentityUser_Order : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -993,6 +993,12 @@ namespace TodoApp.Migrations
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
+                        name: "CustomerID",
+                        column: x => x.CustomerId,
+                        principalTable: "AbpUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "ProductID",
                         column: x => x.ProductId,
                         principalTable: "Products",
@@ -1324,6 +1330,11 @@ namespace TodoApp.Migrations
                 column: "ReferenceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_CustomerId",
+                table: "Orders",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_ProductId",
                 table: "Orders",
                 column: "ProductId");
@@ -1432,10 +1443,10 @@ namespace TodoApp.Migrations
                 name: "AbpRoles");
 
             migrationBuilder.DropTable(
-                name: "AbpUsers");
+                name: "OpenIddictAuthorizations");
 
             migrationBuilder.DropTable(
-                name: "OpenIddictAuthorizations");
+                name: "AbpUsers");
 
             migrationBuilder.DropTable(
                 name: "Products");

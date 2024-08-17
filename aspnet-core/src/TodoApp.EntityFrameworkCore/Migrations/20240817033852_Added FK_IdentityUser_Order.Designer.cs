@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace TodoApp.Migrations
 {
     [DbContext(typeof(TodoAppDbContext))]
-    [Migration("20240816040154_Init Migration")]
-    partial class InitMigration
+    [Migration("20240817033852_Added FK_IdentityUser_Order")]
+    partial class AddedFK_IdentityUser_Order
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,6 +66,8 @@ namespace TodoApp.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("ProductId");
 
@@ -1903,12 +1905,21 @@ namespace TodoApp.Migrations
 
             modelBuilder.Entity("TodoApp.Order", b =>
                 {
+                    b.HasOne("Volo.Abp.Identity.IdentityUser", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("CustomerID");
+
                     b.HasOne("TodoApp.Product", "Product")
                         .WithMany("Orders")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("ProductID");
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Product");
                 });

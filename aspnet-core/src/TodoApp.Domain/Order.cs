@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Identity;
 
 namespace TodoApp
 {
@@ -13,6 +14,9 @@ namespace TodoApp
         public Guid CustomerId { get; set; }
         public int Quantity { get; set; }
         public DateTime OrderDate { get; set; }
+
+        // Khai báo virtual để EF core hỗ trợ lazy loading
         public virtual Product? Product { get; set; }
+        public virtual IdentityUser? Customer { get; set; }  
     }
 }

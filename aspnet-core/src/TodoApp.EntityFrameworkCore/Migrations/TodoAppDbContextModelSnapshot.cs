@@ -64,6 +64,8 @@ namespace TodoApp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerId");
+
                     b.HasIndex("ProductId");
 
                     b.ToTable("Orders", (string)null);
@@ -1900,12 +1902,21 @@ namespace TodoApp.Migrations
 
             modelBuilder.Entity("TodoApp.Order", b =>
                 {
+                    b.HasOne("Volo.Abp.Identity.IdentityUser", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("CustomerID");
+
                     b.HasOne("TodoApp.Product", "Product")
                         .WithMany("Orders")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("ProductID");
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Product");
                 });

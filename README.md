@@ -1,8 +1,8 @@
 # TodoApp
 
 # Add Custom Properties to User Entity
-- Create `UserConsts` in `CustomizeUserDemo.Domain.Shared` project
-- Update `CustomizeUserDemoEfCoreEntityExtensionMappings` class in `CustomizeUserDemo.EntityFramework`
+- Create `UserConsts` in `TodoApp.Domain.Shared` project
+- Update `TodoAppEfCoreEntityExtensionMappings` class in `TodoApp.EntityFramework`
 
 # Pessimistic Locking
 - Use `Isolation Level` - Serializable

@@ -12,6 +12,7 @@ namespace TodoApp
     {
         Task<OrderDto> PlaceOrderAsync(Guid productId, int quantity);
         Task<List<OrderDto>> GetListAsync();
+        Task<OrderDto> GetOrderByIdAsync(Guid orderId);
         Task<OrderDto> CreateAsync(OrderDto data);
         Task DeleteAsync(Guid id);
     }

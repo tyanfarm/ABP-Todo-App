@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TodoApp.Dtos;
 using TodoApp.EntityFrameworkCore;
@@ -52,6 +53,18 @@ namespace TodoApp
             return ObjectMapper.Map<List<Order>, List<OrderDto>>(orders);
         }
 
+        public async Task<OrderDto> GetOrderByIdAsync(Guid orderId)
+        {
+            // Đã config Mapper giữa Product -> ProductDto nên khi Map Order -> OrderDto
+            // sẽ tự động map Product -> ProductDto 
+            // IdentityUser -> IdentityUserDto AutoMapping tương tự
+            var order = await _context.Orders.Include(o => o.Product)
+                                        .Include(o => o.Customer)
+                                        .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            return ObjectMapper.Map<Order, OrderDto>(order);
+        }
+
         public async Task<OrderDto> PlaceOrderAsync(Guid productId, int quantity)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable))
@@ -76,6 +89,7 @@ namespace TodoApp
                 var order = new Order
                 {
                     ProductId = productId,
+                    CustomerId = Guid.Parse("3a146b87-a9f4-9479-4398-0881fc02ce57"),
                     OrderDate = DateTime.Now,
                     Quantity = quantity
                 };
